@@ -32,4 +32,7 @@ chmod 644 "$BASE_PATH/$FILE2"
 echo "🚀 Applying new configurations..."
 /opt/hiddify-manager/apply_configs.sh
 
+echo "🚀 Restart Sing-Box Core..."
+systemctl restart hiddify-singbox
+
 echo "✅ Operation completed successfully."
