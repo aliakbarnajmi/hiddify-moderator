@@ -1,0 +1,62 @@
+{
+  "route": {
+    "rule_set": [
+      {
+        "tag": "geoip-ir",
+        "type": "remote",
+        "format": "binary",
+        "update_interval": "1d",
+        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geoip-ir.srs"
+      },
+      {
+        "tag": "geosite-ir",
+        "type": "remote",
+        "format": "binary",
+        "update_interval": "1d",
+        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-ir.srs"
+      }
+    ],
+    "final": "freedom",
+    "rules": [
+      {
+        "protocol": "quic",
+        "port": [
+          443
+        ],
+        "outbound": "blackhole"
+      },
+      {
+        "outbound": "blackhole",
+        "rule_set": [
+        "geoip-ir",
+        "geosite-ir"
+        ]
+      },
+      {
+        "outbound": "WARP",
+        "geosite": [
+          "google",
+          "spotify",
+          "netflix",
+          "bytedance",
+          "tiktok",
+          "unity",
+          "reddit"
+        ]
+      },
+      {
+        "outbound": "WARP",
+        "domain": [
+          "googleapis.com",
+          "myip.wtf"
+        ]
+      },
+      {
+        "outbound": "blackhole",
+        "geoip": [
+          "private"
+        ]
+      }
+    ]
+  }
+}
