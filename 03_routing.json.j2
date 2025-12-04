@@ -1,62 +1,75 @@
+{% set region = {
+    'zh': 'cn',
+    'cn': 'cn',
+    'ir': 'ir',
+    'ru': 'ru'
+}.get(hconfigs['country'], 'cn') %}
 {
   "route": {
-    "rule_set": [
-      {
-        "tag": "geoip-ir",
-        "type": "remote",
-        "format": "binary",
-        "update_interval": "1d",
-        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geoip-ir.srs"
-      },
-      {
-        "tag": "geosite-ir",
-        "type": "remote",
-        "format": "binary",
-        "update_interval": "1d",
-        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-ir.srs"
-      }
+    "rule_set":[
+         {
+            "tag":"geoip-{{region}}",
+            "type":"remote",
+            "format":"binary",
+            "update_interval":"1d",
+            "url":"https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geoip-{{region}}.srs"
+         },
+         {
+            "tag":"geosite-{{region}}",
+            "type":"remote",
+            "format":"binary",
+            "update_interval":"1d",
+            "url":"https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-{{region}}.srs"
+         }
     ],
-    "final": "freedom",
-    "rules": [
-      {
-        "protocol": "quic",
-        "port": [
-          443
-        ],
-        "outbound": "blackhole"
-      },
-      {
-        "outbound": "blackhole",
-        "rule_set": [
-        "geoip-ir",
-        "geosite-ir"
-        ]
-      },
-      {
-        "outbound": "WARP",
-        "geosite": [
-          "google",
-          "spotify",
-          "netflix",
-          "bytedance",
-          "tiktok",
-          "unity",
-          "reddit"
-        ]
-      },
-      {
-        "outbound": "WARP",
-        "domain": [
-          "googleapis.com",
-          "myip.wtf"
-        ]
-      },
-      {
-        "outbound": "blackhole",
-        "geoip": [
-          "private"
-        ]
-      }
-    ]
-  }
+    // "domainStrategy": "AsIs",
+    "final": {% if hconfigs['warp_mode'] == 'all' %}"WARP"{% else %}"freedom"{% endif %},
+      "rules": [
+        {
+          "protocol": "quic",
+          "port": [443],
+          "outbound": "blackhole"
+        },
+        {
+            "outbound": "blackhole",
+             "rule_set":[
+              "geoip-{{region}}", "geosite-{{region}}"
+             ]
+        },
+        {% if hconfigs['warp_mode'] != 'disable' %}
+          {
+              "outbound": "WARP",
+              "geosite":[
+                  "google",
+                  "spotify",
+                  "netflix",
+                  "bytedance",
+                  "tiktok",
+                  "unity",
+                  "reddit"
+              ]
+          },
+          {% if hconfigs.get('warp_sites','').split('\n') %}
+          {
+              "outbound": "WARP",
+              "domain":[                
+                    {%for d in hconfigs.get('warp_sites','').split('\n')%}
+                        "{{d.strip()}}",
+                    {% endfor %}
+              ]
+          },
+          {% endif %}
+        {% endif %}
+        {
+          "outbound": "blackhole", "geoip": ["private"]
+        },
+        {
+        "type": "field", 
+        "outboundTag": "blackhole", 
+        "protocol": ["bittorrent"]
+        }
+      ]
+    }
+  
+
 }
