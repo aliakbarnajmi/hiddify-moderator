@@ -11,7 +11,7 @@
                                 "listen_port": {{ port }},
                                 "up_mbps": {{ chconfigs[d['child_id']]['hysteria_up_mbps'] }},
                                 "down_mbps": {{ chconfigs[d['child_id']]['hysteria_down_mbps'] }},
-                                "ignore_client_bandwidth":true,
+                                "ignore_client_bandwidth": true,
                                 "sniff": true,
                                 {% if chconfigs[d['child_id']]['hysteria_obfs_enable'] %}
                                 "obfs": {
